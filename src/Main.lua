@@ -1,10 +1,10 @@
 --// Loaded Check
 
-if AirHubV2Loaded or AirHubV2Loading or AirHub then
+if AirHubV3Loaded or AirHubV3Loading or AirHub then
 	return
 end
 
-getgenv().AirHubV2Loading = true
+getgenv().AirHubV3Loading = true
 
 --// Cache
 
@@ -886,7 +886,7 @@ SettingsSection:Button({
 		GUI:Unload()
 		ESP:Exit()
 		Aimbot:Exit()
-		getgenv().AirHubV2Loaded = nil
+		getgenv().AirHubV3Loaded = nil
 	end
 })
 
@@ -976,8 +976,8 @@ end)
 
 ESP.Load()
 Aimbot.Load()
-getgenv().AirHubV2Loaded = true
-getgenv().AirHubV2Loading = nil
+getgenv().AirHubV3Loaded = true
+getgenv().AirHubV3Loading = nil
 
 GeneralSignal:Fire()
 GUI:Close()
