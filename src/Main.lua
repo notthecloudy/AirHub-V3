@@ -1,10 +1,3 @@
---[[
-
-	AirHub V2 by Exunys © CC0 1.0 Universal (2023)
-	https://github.com/Exunys
-
-]]
-
 --// Loaded Check
 
 if AirHubV2Loaded or AirHubV2Loading or AirHub then
@@ -932,12 +925,12 @@ ProfilesSection:Button({
 	end
 })
 
-InformationSection:Label("Made by Exunys")
+InformationSection:Label("Made by Cloudy")
 
 InformationSection:Button({
 	Name = "Copy GitHub",
 	Callback = function()
-		setclipboard("https://github.com/Exunys")
+		setclipboard("https://github.com/Cloudy")
 	end
 })
 

@@ -119,7 +119,7 @@ local Functions = {
 			if Value.playing ~= Value.maxPlayers and Value.playing and Value.playing > MinPlayers or Value.maxPlayers / 2 and Value.ping < MaxPing or 100 then
 				Services.TeleportService:TeleportToPlaceInstance(game.PlaceId, Value.id, Variables.LocalPlayer)
 			else
-				warn("Exunys Developer - ROBLOX Functions & Services Reference Library > Server Hop - Couldn't find a server to hop to! Consider using the \"Rejoin\" option.")
+				warn("Cloudy Developer - ROBLOX Functions & Services Reference Library > Server Hop - Couldn't find a server to hop to! Consider using the \"Rejoin\" option.")
 			end
 		end
 	end,

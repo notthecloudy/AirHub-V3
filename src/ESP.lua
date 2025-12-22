@@ -1,18 +1,3 @@
---[[
-
-	Universal Extra-Sensory Perception (ESP) Module by Exunys © CC0 1.0 Universal (2023 - 2024)
-
-	https://github.com/Exunys
-
-	- ESP						  > [Players, NPCs & Parts]
-	- Tracer					  > [Players, NPCs & Parts]
-	- Head Dot					  > [Players & NPCs]
-	- Box						  > [Players, NPCs & Parts]
-	- Health Bar				  > [Players & NPCs]
-	- Chams (R6 & R15)			  > [Players, NPCs & Parts]
-
-]]
-
 --// Caching
 
 local game = game
@@ -37,7 +22,7 @@ if not Drawing or not Drawing.new or not Drawing.Fonts then
 	until Drawing and Drawing.new and type(Drawing.new) == "function" and Drawing.Fonts and type(Drawing.Fonts) == "table"
 end
 
-local ConfigLibrary = loadstring(game.HttpGet(game, "https://raw.githubusercontent.com/Exunys/Config-Library/main/Main.lua"))()
+local ConfigLibrary = loadstring(game.HttpGet(game, "https://raw.githubusercontent.com/Cloudy/Config-Library/main/Main.lua"))()
 
 local Vector2new, Vector3zero, CFramenew = Vector2.new, Vector3.zero, CFrame.new
 local Drawingnew, DrawingFonts = Drawing.new, Drawing.Fonts
@@ -67,7 +52,7 @@ end, function(self, Index, Value)
 end
 
 if identifyexecutor() == "Solara" then -- Quads are broken on Solara.
-	local DrawQuad = loadstring(game.HttpGet(game, "https://raw.githubusercontent.com/Exunys/Custom-Quad-Render-Object/main/Main.lua"))() -- Custom Quad Drawing Object
+	local DrawQuad = loadstring(game.HttpGet(game, "https://raw.githubusercontent.com/Cloudy/Custom-Quad-Render-Object/main/Main.lua"))() -- Custom Quad Drawing Object
 	local _Drawingnew = clonefunction(Drawing.new)
 
 	Drawingnew = function(...)
@@ -157,7 +142,7 @@ if not Degrade then
 	setrenderproperty = getupvalue(getmetatable(TemporaryDrawing).__newindex, 4)
 	TemporaryDrawing.Remove(TemporaryDrawing)
 else
-	local DrawQuad = loadstring(game.HttpGet(game, "https://raw.githubusercontent.com/Exunys/Custom-Quad-Render-Object/main/Main.lua"))() -- Custom Quad Drawing Object
+	local DrawQuad = loadstring(game.HttpGet(game, "https://raw.githubusercontent.com/Cloudy/Custom-Quad-Render-Object/main/Main.lua"))() -- Custom Quad Drawing Object
 	local _Drawingnew = clonefunction(Drawing.new)
 
 	local TemporaryDrawing = Drawingnew("Line")
@@ -192,7 +177,7 @@ else
 
 	TemporaryDrawing.Remove(TemporaryDrawing)
 
-	warn("EXUNYS_ESP > Your exploit does not support this module's optimizations! The visuals might be laggy and decrease performance.")
+	warn("Cloudy_ESP > Your exploit does not support this module's optimizations! The visuals might be laggy and decrease performance.")
 end
 ]=]
 
@@ -214,15 +199,15 @@ local Inf, Nan, Loaded, CrosshairParts = 1 / 0, 0 / 0, false, {
 
 --// Checking for multiple processes
 
-if ExunysDeveloperESP and ExunysDeveloperESP.Exit then
-	ExunysDeveloperESP:Exit()
+if CloudyDeveloperESP and CloudyDeveloperESP.Exit then
+	CloudyDeveloperESP:Exit()
 end
 
 --// Settings
 
-getgenv().ExunysDeveloperESP = {
+getgenv().CloudyDeveloperESP = {
 	DeveloperSettings = {
-		Path = "Exunys Developer/Exunys ESP/Configuration.cfg",
+		Path = "Cloudy Developer/Cloudy ESP/Configuration.cfg",
 		UnwrapOnCharacterAbsence = false,
 		UpdateMode = "RenderStepped",
 		TeamCheckOption = "TeamColor",
@@ -381,7 +366,7 @@ getgenv().ExunysDeveloperESP = {
 	}
 }
 
-local Environment = getgenv().ExunysDeveloperESP
+local Environment = getgenv().CloudyDeveloperESP
 
 --// Functions
 
@@ -421,7 +406,7 @@ local CoreFunctions = {
 		local Result = ""
 
 		for _ = 1, Bits do
-			Result ..= ("EXUNYS_ESP")[mathrandom(1, 2) == 1 and "upper" or "lower"](stringchar(mathrandom(97, 122)))
+			Result ..= ("Cloudy_ESP")[mathrandom(1, 2) == 1 and "upper" or "lower"](stringchar(mathrandom(97, 122)))
 		end
 
 		return Result
@@ -1468,7 +1453,7 @@ local UtilityFunctions = {
 	end,
 
 	WrapObject = function(self, Object, PseudoName, Allowed, RenderDistance)
-		assert(self, "EXUNYS_ESP > UtilityFunctions.WrapObject - Internal error, unassigned parameter \"self\".")
+		assert(self, "Cloudy_ESP > UtilityFunctions.WrapObject - Internal error, unassigned parameter \"self\".")
 
 		if pcall(gethiddenproperty, Object, "PrimaryPart") then
 			Object = __index(Object, "PrimaryPart")
@@ -1524,7 +1509,7 @@ local UtilityFunctions = {
 			if not pcall(function()
 				return __index(Entry.Object, "Position"), __index(Entry.Object, "CFrame")
 			end) then
-				warn("EXUNYS_ESP > UtilityFunctions.WrapObject - Attempted to wrap object of an unsupported class type: \""..(__index(Entry.Object, "ClassName") or "N / A").."\"")
+				warn("Cloudy_ESP > UtilityFunctions.WrapObject - Attempted to wrap object of an unsupported class type: \""..(__index(Entry.Object, "ClassName") or "N / A").."\"")
 				return self.UnwrapObject(Entry.Hash)
 			end
 
@@ -1690,7 +1675,7 @@ Environment.UnwrapPlayers = function() -- (<void>) => <boolean> Success Status
 end
 
 Environment.UnwrapAll = function(self) -- METHOD | (<void>) => <void>
-	assert(self, "EXUNYS_ESP.UnwrapAll: Missing parameter #1 \"self\" <table>.")
+	assert(self, "Cloudy_ESP.UnwrapAll: Missing parameter #1 \"self\" <table>.")
 
 	if self.UnwrapPlayers() and CrosshairParts.LeftLine then
 		self.RemoveCrosshair()
@@ -1700,7 +1685,7 @@ Environment.UnwrapAll = function(self) -- METHOD | (<void>) => <void>
 end
 
 Environment.Restart = function(self) -- METHOD | (<void>) => <void>
-	assert(self, "EXUNYS_ESP.Restart: Missing parameter #1 \"self\" <table>.")
+	assert(self, "Cloudy_ESP.Restart: Missing parameter #1 \"self\" <table>.")
 
 	local Objects = {}
 
@@ -1723,7 +1708,7 @@ Environment.Restart = function(self) -- METHOD | (<void>) => <void>
 end
 
 Environment.Exit = function(self) -- METHOD | (<void>) => <void>
-	assert(self, "EXUNYS_ESP.Exit: Missing parameter #1 \"self\" <table>.")
+	assert(self, "Cloudy_ESP.Exit: Missing parameter #1 \"self\" <table>.")
 
 	if self:UnwrapAll() then
 		for _, Connection in next, self.UtilityAssets.ServiceConnections do
@@ -1743,7 +1728,7 @@ Environment.Exit = function(self) -- METHOD | (<void>) => <void>
 		end
 
 		for Index, _ in next, Environment do
-			getgenv().ExunysDeveloperESP[Index] = nil
+			getgenv().CloudyDeveloperESP[Index] = nil
 		end
 
 		LoadESP = nil; Recursive = nil; Loaded = false
@@ -1752,7 +1737,7 @@ Environment.Exit = function(self) -- METHOD | (<void>) => <void>
 			cleardrawcache()
 		end
 
-		getgenv().ExunysDeveloperESP = nil
+		getgenv().CloudyDeveloperESP = nil
 	end
 end
 
@@ -1794,21 +1779,21 @@ Environment.Load = function() -- (<void>) => <void>
 end
 
 Environment.UpdateConfiguration = function(DeveloperSettings, Settings, Properties) -- (<table> DeveloperSettings, <table> Settings, <table> Properties) => <table> New Environment
-	assert(DeveloperSettings, "EXUNYS_ESP.UpdateConfiguration: Missing parameter #1 \"DeveloperSettings\" <table>.")
-	assert(Settings, "EXUNYS_ESP.UpdateConfiguration: Missing parameter #2 \"Settings\" <table>.")
-	assert(Properties, "EXUNYS_ESP.UpdateConfiguration: Missing parameter #3 \"Properties\" <table>.")
+	assert(DeveloperSettings, "Cloudy_ESP.UpdateConfiguration: Missing parameter #1 \"DeveloperSettings\" <table>.")
+	assert(Settings, "Cloudy_ESP.UpdateConfiguration: Missing parameter #2 \"Settings\" <table>.")
+	assert(Properties, "Cloudy_ESP.UpdateConfiguration: Missing parameter #3 \"Properties\" <table>.")
 
-	getgenv().ExunysDeveloperESP.DeveloperSettings = DeveloperSettings
-	getgenv().ExunysDeveloperESP.Settings = Settings
-	getgenv().ExunysDeveloperESP.Properties = Properties
+	getgenv().CloudyDeveloperESP.DeveloperSettings = DeveloperSettings
+	getgenv().CloudyDeveloperESP.Settings = Settings
+	getgenv().CloudyDeveloperESP.Properties = Properties
 
-	Environment = getgenv().ExunysDeveloperESP
+	Environment = getgenv().CloudyDeveloperESP
 
 	return Environment
 end
 
 Environment.LoadConfiguration = function(self) -- METHOD | (<void>) => <void>
-	assert(self, "EXUNYS_ESP.LoadConfiguration: Missing parameter #1 \"self\" <table>.")
+	assert(self, "Cloudy_ESP.LoadConfiguration: Missing parameter #1 \"self\" <table>.")
 
 	local Path = self.DeveloperSettings.Path
 
@@ -1826,7 +1811,7 @@ Environment.LoadConfiguration = function(self) -- METHOD | (<void>) => <void>
 end
 
 Environment.SaveConfiguration = function(self) -- METHOD | (<void>) => <void>
-	assert(self, "EXUNYS_ESP.SaveConfiguration: Missing parameter #1 \"self\" <table>.")
+	assert(self, "Cloudy_ESP.SaveConfiguration: Missing parameter #1 \"self\" <table>.")
 
 	local DeveloperSettings = self.DeveloperSettings
 
