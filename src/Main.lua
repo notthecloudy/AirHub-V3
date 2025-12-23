@@ -25,11 +25,31 @@ local osdate = os.date
 
 --// Launching
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/notthecloudy/AirHub-V3/main/Library.lua"))()
+--// Launching (Safe Version)
 
-local GUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/notthecloudy/AirHub-V3/main/src/UI%20Library.lua"))()
-local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/notthecloudy/AirHub-V3/main/src/ESP.lua"))()
-local Aimbot = loadstring(game:HttpGet("https://raw.githubusercontent.com/notthecloudy/AirHub-V3/main/src/Aimbot.lua"))()
+local function SafeLoad(url, name)
+    local success, result = pcall(function()
+        local code = game:HttpGet(url)
+        assert(code and #code > 0, "Empty response")
+        return loadstring(code)()
+    end)
+    if not success then
+        warn("Failed to load "..name..": "..tostring(result))
+    end
+    return result
+end
+
+-- Load Library
+SafeLoad("https://raw.githubusercontent.com/notthecloudy/AirHub-V3/refs/heads/main/src/Library.lua", "Library")
+
+-- Load GUI
+local GUI = SafeLoad("https://raw.githubusercontent.com/notthecloudy/AirHub-V3/main/src/UI%20Library.lua", "UI Library")
+
+-- Load ESP
+local ESP = SafeLoad("https://raw.githubusercontent.com/notthecloudy/AirHub-V3/main/src/ESP.lua", "ESP")
+
+-- Load Aimbot
+local Aimbot = SafeLoad("https://raw.githubusercontent.com/notthecloudy/AirHub-V3/main/src/Aimbot.lua", "Aimbot")
 
 --// Variables
 
