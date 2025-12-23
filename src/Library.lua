@@ -35,8 +35,16 @@ local Variables = {
 
 --// Functions
 
+-- Resolve GetService safely for Lua 5.1
+local SafeGetService
+if clonefunction then
+	SafeGetService = clonefunction(GetService)
+else
+	SafeGetService = GetService
+end
+
 local Functions = {
-	GetService = clonefunction and clonefunction(GetService) or GetService,
+	GetService = SafeGetService,
 	
 	Encode = function(Table)
 		return Table and type(Table) == "table" and Services.HttpService:JSONEncode(Table)
