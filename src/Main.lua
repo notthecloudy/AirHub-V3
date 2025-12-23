@@ -144,37 +144,33 @@ local AddValues = function(Section, Object, Exceptions, Prefix)
 	end
 
 	for Index, Value in next, Copy do
-		if typeof(Value) ~= "boolean" or (Exceptions and tablefind(Exceptions, Index)) then
-			continue
+		if typeof(Value) == "boolean" and not (Exceptions and tablefind(Exceptions, Index)) then
+			Section:Toggle({
+				Name = stringgsub(Index, "(%l)(%u)", function(...)
+					return select(1, ...).." "..select(2, ...)
+				end),
+				Flag = Prefix..Index,
+				Default = Value,
+				Callback = function(_Value)
+					Object[Index] = _Value
+				end
+			})
 		end
-
-		Section:Toggle({
-			Name = stringgsub(Index, "(%l)(%u)", function(...)
-				return select(1, ...).." "..select(2, ...)
-			end),
-			Flag = Prefix..Index,
-			Default = Value,
-			Callback = function(_Value)
-				Object[Index] = _Value
-			end
-		})
 	end
 
 	for Index, Value in next, Copy do
-		if typeof(Value) ~= "Color3" or (Exceptions and tablefind(Exceptions, Index)) then
-			continue
+		if typeof(Value) == "Color3" and not (Exceptions and tablefind(Exceptions, Index)) then
+			Section:Colorpicker({
+				Name = stringgsub(Index, "(%l)(%u)", function(...)
+					return select(1, ...).." "..select(2, ...)
+				end),
+				Flag = Index,
+				Default = Value,
+				Callback = function(_Value)
+					Object[Index] = _Value
+				end
+			})
 		end
-
-		Section:Colorpicker({
-			Name = stringgsub(Index, "(%l)(%u)", function(...)
-				return select(1, ...).." "..select(2, ...)
-			end),
-			Flag = Index,
-			Default = Value,
-			Callback = function(_Value)
-				Object[Index] = _Value
-			end
-		})
 	end
 end
 

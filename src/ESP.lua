@@ -527,18 +527,16 @@ local UpdatingFunctions = {
 		setrenderproperty(BottomTextObject, "Visible", OnScreen)
 
 		if getrenderproperty(TopTextObject, "Visible") then
-			for Index, Value in next, Settings do
-				if stringfind(Index, "Color") or stringfind(Index, "Display") then
-					continue
-				end
-
+		for Index, Value in next, Settings do
+			if not (stringfind(Index, "Color") or stringfind(Index, "Display")) then
 				if not pcall(getrenderproperty, TopTextObject, Index) then
-					continue
+					-- skip
+				else
+					setrenderproperty(TopTextObject, Index, Value)
+					setrenderproperty(BottomTextObject, Index, Value)
 				end
-
-				setrenderproperty(TopTextObject, Index, Value)
-				setrenderproperty(BottomTextObject, Index, Value)
 			end
+		end
 
 			local GetColor = CoreFunctions.GetColor
 
@@ -589,15 +587,13 @@ local UpdatingFunctions = {
 
 		if getrenderproperty(TracerObject, "Visible") then
 			for Index, Value in next, Settings do
-				if Index == "Color" then
-					continue
+				if Index ~= "Color" then
+					if not pcall(getrenderproperty, TracerObject, Index) then
+						-- skip
+					else
+						setrenderproperty(TracerObject, Index, Value)
+					end
 				end
-
-				if not pcall(getrenderproperty, TracerObject, Index) then
-					continue
-				end
-
-				setrenderproperty(TracerObject, Index, Value)
 			end
 
 			setrenderproperty(TracerObject, "Color", CoreFunctions.GetColor(Entry.Object, Settings.RainbowColor and CoreFunctions.GetRainbowColor() or Settings.Color))
@@ -650,18 +646,16 @@ local UpdatingFunctions = {
 
 		if getrenderproperty(CircleObject, "Visible") then
 			for Index, Value in next, Settings do
-				if stringfind(Index, "Color") then
-					continue
-				end
+				if not stringfind(Index, "Color") then
+					if not pcall(getrenderproperty, CircleObject, Index) then
+						-- skip
+					else
+						setrenderproperty(CircleObject, Index, Value)
 
-				if not pcall(getrenderproperty, CircleObject, Index) then
-					continue
-				end
-
-				setrenderproperty(CircleObject, Index, Value)
-
-				if Settings.Outline then
-					setrenderproperty(CircleOutlineObject, Index, Value)
+						if Settings.Outline then
+							setrenderproperty(CircleOutlineObject, Index, Value)
+						end
+					end
 				end
 			end
 
@@ -730,15 +724,13 @@ local UpdatingFunctions = {
 
 		if getrenderproperty(MainObject, "Visible") then
 			for Index, Value in next, Settings do
-				if Index == "Color" then
-					continue
+				if Index ~= "Color" then
+					if not pcall(getrenderproperty, MainObject, Index) then
+						-- skip
+					else
+						setrenderproperty(MainObject, Index, Value)
+					end
 				end
-
-				if not pcall(getrenderproperty, MainObject, Index) then
-					continue
-				end
-
-				setrenderproperty(MainObject, Index, Value)
 			end
 
 			Humanoid = Humanoid or FindFirstChildOfClass(__index(Entry.Object, "Character"), "Humanoid")
@@ -836,11 +828,11 @@ local UpdatingFunctions = {
 			end
 
 			if not pcall(_get, Quads.Quad1Object, Index) then
-				continue
-			end
-
-			for _, RenderObject in next, Quads do
-				_set(RenderObject, Index, Value)
+				-- skip
+			else
+				for _, RenderObject in next, Quads do
+					_set(RenderObject, Index, Value)
+				end
 			end
 		end
 
@@ -1599,12 +1591,9 @@ local LoadESP = function()
 			local Player = nil
 
 			for _, _Value in next, Environment.UtilityAssets.WrappedObjects do
-				if not _Value.IsAPlayer then
-					continue
-				end
-
-				if __index(_Value.Object, "Name") == __index(Value, "Name") then
+				if _Value.IsAPlayer and __index(_Value.Object, "Name") == __index(Value, "Name") then
 					Player = _Value
+					break
 				end
 			end
 
@@ -1619,19 +1608,15 @@ local LoadESP = function()
 		local Hash = UtilityFunctions:WrapObject(Player)
 
 		for _, Entry in next, WrappedObjects do
-			if Entry.Hash ~= Hash then
-				continue
-			end
-
-			Entry.Connections[__index(Player, "Name").."CharacterAdded"] = Connect(__index(Player, "CharacterAdded"), function(Object)
-				for _, _Value in next, Environment.UtilityAssets.WrappedObjects do
-					if not _Value.Name == __index(Object, "Name") then
-						continue
+			if Entry.Hash == Hash then
+				Entry.Connections[__index(Player, "Name").."CharacterAdded"] = Connect(__index(Player, "CharacterAdded"), function(Object)
+					for _, _Value in next, Environment.UtilityAssets.WrappedObjects do
+						if _Value.Name == __index(Object, "Name") then
+							UtilityFunctions:WrapObject(GetPlayerFromCharacter(Object))
+						end
 					end
-
-					UtilityFunctions:WrapObject(GetPlayerFromCharacter(Object))
-				end
-			end)
+				end)
+			end
 		end
 	end)
 end

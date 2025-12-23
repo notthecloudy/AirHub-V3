@@ -1,3 +1,6 @@
-- [ ] Fix GetClosestPlayer function in src/Library.lua: Replace continue statements with skip flag logic
-- [ ] Fix GetHWID function in src/Library.lua: Replace continue with early return
-- [ ] Verify the file compiles without errors
+- [x] Fix GetClosestPlayer function in src/Library.lua: Replace continue statements with skip flag logic
+- [x] Fix GetHWID function in src/Library.lua: Replace continue with early return
+- [x] Verify the file compiles without errors
+- [x] Fix continue statements in src/Main.lua
+- [x] Fix continue statements in src/Aimbot.lua
+- [ ] Check other Lua files (ESP.lua, UI Library.lua) for continue statements and fix if needed

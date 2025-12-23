@@ -186,16 +186,13 @@ local GetClosestPlayer = function()
 
 			if Value ~= LocalPlayer and not tablefind(Environment.Blacklisted, __index(Value, "Name")) and Character and FindFirstChild(Character, LockPart) and Humanoid then
 				local PartPosition, TeamCheckOption = __index(Character[LockPart], "Position"), Environment.DeveloperSettings.TeamCheckOption
+				local skip = false
 
 				if Settings.TeamCheck and __index(Value, TeamCheckOption) == __index(LocalPlayer, TeamCheckOption) then
-					continue
-				end
-
-				if Settings.AliveCheck and __index(Humanoid, "Health") <= 0 then
-					continue
-				end
-
-				if Settings.WallCheck then
+					skip = true
+				elseif Settings.AliveCheck and __index(Humanoid, "Health") <= 0 then
+					skip = true
+				elseif Settings.WallCheck then
 					local BlacklistTable = GetDescendants(__index(LocalPlayer, "Character"))
 
 					for _, Value in next, GetDescendants(Character) do
@@ -203,16 +200,18 @@ local GetClosestPlayer = function()
 					end
 
 					if #GetPartsObscuringTarget(Camera, {PartPosition}, BlacklistTable) > 0 then
-						continue
+						skip = true
 					end
 				end
 
-				local Vector, OnScreen, Distance = WorldToViewportPoint(Camera, PartPosition)
-				Vector = ConvertVector(Vector)
-				Distance = (GetMouseLocation(UserInputService) - Vector).Magnitude
+				if not skip then
+					local Vector, OnScreen, Distance = WorldToViewportPoint(Camera, PartPosition)
+					Vector = ConvertVector(Vector)
+					Distance = (GetMouseLocation(UserInputService) - Vector).Magnitude
 
-				if Distance < RequiredDistance and OnScreen then
-					RequiredDistance, Environment.Locked = Distance, Value
+					if Distance < RequiredDistance and OnScreen then
+						RequiredDistance, Environment.Locked = Distance, Value
+					end
 				end
 			end
 		end
