@@ -47,11 +47,15 @@ local Functions = {
 	GetService = SafeGetService,
 	
 	Encode = function(Table)
-		return Table and type(Table) == "table" and Services.HttpService:JSONEncode(Table)
+		if Table and type(Table) == "table" then
+			return Services.HttpService:JSONEncode(Table)
+		end
 	end,
 
 	Decode = function(String)
-		return String and type(String) == "string" and Services.HttpService:JSONDecode(String)
+		if String and type(String) == "string" then
+			return Services.HttpService:JSONDecode(String)
+		end
 	end,
 
 	SendNotification = function(TitleArg, DescriptionArg, DurationArg, IconArg)
