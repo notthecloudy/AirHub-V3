@@ -64,7 +64,7 @@ local Variables = {
 
 local Functions = {
 	GetService = clonefunction and clonefunction(GetService) or GetService,
-	
+
 	Encode = function(Table)
 		return Table and type(Table) == "table" and Services.HttpService:JSONEncode(Table)
 	end,
@@ -84,7 +84,7 @@ local Functions = {
 
 	StringToRGB = function(String)
 		if not String then return end
-		
+
 		local R = tonumber(string.match(String, "([%d]+)[%s]*,[%s]*[%d]+[%s]*,[%s]*[%d]+"))
 		local G = tonumber(string.match(String, "[%d]+[%s]*,[%s]*([%d]+)[%s]*,[%s]*[%d]+"))
 		local B = tonumber(string.match(String, "[%d]+[%s]*,[%s]*[%d]+[%s]*,[%s]*([%d]+)"))
@@ -153,6 +153,10 @@ local Functions = {
 
 	SetFOV = function(FOV)
 		Services.Camera.FieldOfView = FOV
+	end,
+
+	SetMouseIconVisibility = function(Value)
+		Services.UserInputService.MouseIconEnabled = Value
 	end
 }
 
@@ -815,7 +819,7 @@ Crosshair_Settings:Toggle({
 Crosshair_Settings:Toggle({
 	Name = "Enable ROBLOX Cursor",
 	Flag = "Cursor_Enabled",
-	Default = UserInputService.MouseIconEnabled,
+	Default = UserInputService and UserInputService.MouseIconEnabled or false,
 	Callback = SetMouseIconVisibility
 })
 

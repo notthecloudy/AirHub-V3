@@ -33,7 +33,12 @@ local success, result = pcall(function()
 end)
 if not success then
     warn("Failed to load ConfigLibrary: " .. tostring(result))
-    ConfigLibrary = {} -- Provide a fallback or handle appropriately
+    -- Provide fallback ConfigLibrary with dummy functions
+    ConfigLibrary = {
+        LoadConfig = function() return {} end,
+        SaveConfig = function() end,
+        CloneTable = function(tbl) return tbl end
+    }
 end
 
 local Vector2new, Vector3zero, CFramenew = Vector2.new, Vector3.zero, CFrame.new
