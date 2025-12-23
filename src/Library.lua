@@ -1,11 +1,9 @@
--- Ensure cloneref is defined properly
-local cloneref = function(...)
-    return ...
+local cloneref = cloneref or function(...)
+	return ...
 end
 
--- Fix GetService function to use the correct method call syntax
 local GetService = function(Service)
-    return cloneref(game:GetService(Service))  -- Correct usage of game:GetService
+	return cloneref(game.GetService(game, Service))
 end
 
 --// Services
@@ -37,27 +35,15 @@ local Variables = {
 
 --// Functions
 
--- Resolve GetService safely for Lua 5.1
-local SafeGetService
-if clonefunction then
-	SafeGetService = clonefunction(GetService)
-else
-	SafeGetService = GetService
-end
-
 local Functions = {
-	GetService = SafeGetService,
+	GetService = clonefunction and clonefunction(GetService) or GetService,
 	
 	Encode = function(Table)
-		if Table and type(Table) == "table" then
-			return Services.HttpService:JSONEncode(Table)
-		end
+		return Table and type(Table) == "table" and Services.HttpService:JSONEncode(Table)
 	end,
 
 	Decode = function(String)
-		if String and type(String) == "string" then
-			return Services.HttpService:JSONDecode(String)
-		end
+		return String and type(String) == "string" and Services.HttpService:JSONDecode(String)
 	end,
 
 	SendNotification = function(TitleArg, DescriptionArg, DurationArg, IconArg)
@@ -91,26 +77,18 @@ local Functions = {
 		local Target = nil
 
 		for _, Value in next, Services.Players:GetPlayers() do
-			if Value ~= Variables.LocalPlayer and Value.Character and Value.Character:FindFirstChild(Part) then
-				local skip = false
-
+			if Value ~= Variables.LocalPlayer and Value.Character[Part] then
 				if type(Settings) == "table" then
-					if Settings[1] and Value.TeamColor == Variables.LocalPlayer.TeamColor then
-						skip = true
-					elseif Settings[2] and Value.Character:FindFirstChild("Humanoid") and Value.Character.Humanoid.Health <= 0 then
-						skip = true
-					elseif Settings[3] and #(Services.Camera:GetPartsObscuringTarget({Value.Character[Part].Position}, Value.Character:GetDescendants())) > 0 then
-						skip = true
-					end
+					if Settings[1] and Value.TeamColor == Variables.LocalPlayer.TeamColor then continue end
+					if Settings[2] and Value.Character.Humanoid.Health <= 0 then continue end
+					if Settings[3] and #(Services.Camera:GetPartsObscuringTarget({Value.Character[Part].Position}, Value.Character:GetDescendants())) > 0 then continue end
 				end
 
-				if not skip then
-					local Vector, OnScreen = Services.Camera:WorldToViewportPoint(Value.Character[Part].Position)
-					local Distance = (Services.UserInputService:GetMouseLocation() - Vector2.new(Vector.X, Vector.Y)).Magnitude
+				local Vector, OnScreen = Services.Camera:WorldToViewportPoint(Value.Character[Part].Position)
+				local Distance = (Services.UserInputService:GetMouseLocation() - Vector2.new(Vector.X, Vector.Y)).Magnitude
 
-					if Distance < RequiredDistance and OnScreen then
-						RequiredDistance, Target = Distance, Value
-					end
+				if Distance < RequiredDistance and OnScreen then
+					RequiredDistance, Target = Distance, Value
 				end
 			end
 		end
@@ -138,10 +116,10 @@ local Functions = {
 
 	ServerHop = function(MinPlayers, MaxPing)
 		for _, Value in next, Services.HttpService:JSONDecode(game:HttpGet(string.format("https://games.roblox.com/v1/games/%s/servers/Public?sortOrder=Asc&limit=100", game.PlaceId))) do
-			if (Value.playing ~= Value.maxPlayers and Value.playing > MinPlayers) or (Value.maxPlayers / 2 and Value.ping < MaxPing) or 100 then
+			if Value.playing ~= Value.maxPlayers and Value.playing and Value.playing > MinPlayers or Value.maxPlayers / 2 and Value.ping < MaxPing or 100 then
 				Services.TeleportService:TeleportToPlaceInstance(game.PlaceId, Value.id, Variables.LocalPlayer)
 			else
-				warn("Cloudy Developer - ROBLOX Functions & Services Reference Library > Server Hop - Couldn't find a server to hop to! Consider using the \"Rejoin\" option.")
+				warn("Exunys Developer - ROBLOX Functions & Services Reference Library > Server Hop - Couldn't find a server to hop to! Consider using the \"Rejoin\" option.")
 			end
 		end
 	end,
@@ -190,9 +168,9 @@ local Functions = {
 		local Data = Services.HttpService:JSONDecode(syn.request({Url = "https://httpbin.org/get"; Method = "GET"}).Body)
 
 		for _, Value in next, {"Exploit-Guid", "Syn-Fingerprint", "Proto-User-Identifier", "Sentinel-Fingerprint", "SW-Fingerprint", "krnl-hwid"} do
-			if Data.headers[Value] then
-				return Data.headers[Value]
-			end
+			if not Data.headers[Value] then continue end
+
+			return Data.headers[Value]
 		end
 	end,
 
