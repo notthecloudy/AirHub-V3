@@ -1,51 +1,99 @@
---// Loaded Check
-
-if AirHubV3Loaded or AirHubV3Loading then
+-- Loaded Check
+local genv = getgenv()
+if genv.AirHubV3Loaded or genv.AirHubV3Loading then
 	return
 end
+genv.AirHubV3Loading = true
 
-getgenv().AirHubV3Loading = true
+--// Cache / locals
+local _game = game
+local loadstring_fn = loadstring or load
+local typeof_fn = typeof
+local pcall_fn = pcall
+local table_find, table_sort = table.find, table.sort
+local math_floor = math.floor
+local string_gsub = string.gsub
+local wait_fn, delay_fn, spawn_fn = task.wait, task.delay, task.spawn
+local os_date = os.date
 
---// Cache
+-- Strip BOM from a string if present
+local function strip_bom(s)
+	if typeof_fn(s) == "string" and s:sub(1,3) == "\239\187\191" then
+		return s:sub(4)
+	end
+	return s
+end
 
-local game = game
-local loadstring, typeof, select, next, pcall = loadstring, typeof, select, next, pcall
-local tablefind, tablesort = table.find, table.sort
-local mathfloor = math.floor
-local stringgsub = string.gsub
-local wait, delay, spawn = task.wait, task.delay, task.spawn
-local osdate = os.date
+-- Safe Http GET wrapper (tries multiple options)
+local function safeHttpGet(url)
+	local ok, res = pcall(function()
+		-- Many exploit environments implement :HttpGet or :HttpGetAsync; fallback to HttpService otherwise
+		if _game.HttpGet then
+			return _game:HttpGet(url)
+		elseif _game.HttpGetAsync then
+			return _game:HttpGetAsync(url)
+		else
+			local hs = game:GetService and game:GetService("HttpService")
+			if hs and hs.GetAsync then
+				return hs:GetAsync(url)
+			end
+		end
+		error("No HttpGet / GetAsync available in this environment")
+	end)
 
---// Launching
+	if not ok then
+		warn("HttpGet failed for "..tostring(url)..": "..tostring(res))
+		return nil
+	end
+	return res
+end
 
+-- Load a remote Lua file safely
 local function loadScript(url)
-	local content = game:HttpGet(url)
-	if content == "" then
-		warn("Failed to get script content from " .. url)
+	local content = safeHttpGet(url)
+	if not content or content == "" then
+		warn("Failed to get script content from " .. tostring(url))
 		return nil
 	end
-	-- Remove BOM if present
-	if content:sub(1, 3) == "\xEF\xBB\xBF" then
-		content = content:sub(4)
-	end
-	local success, func = pcall(loadstring, content)
-	if not success then
-		warn("Failed to load script from " .. url .. ": " .. func)
+
+	content = strip_bom(content)
+
+	-- Detect accidental HTML (e.g. fetched a GitHub page instead of raw file)
+	if content:match("<!DOCTYPE") or content:match("<html") then
+		warn("Received HTML instead of raw Lua from " .. tostring(url) .. ". Check the URL (use raw.githubusercontent.com with branch/path).")
 		return nil
 	end
-	local success2, result = pcall(func)
-	if not success2 then
-		warn("Failed to execute script from " .. url .. ": " .. result)
+
+	if not loadstring_fn then
+		warn("No loadstring or load function available in this environment.")
 		return nil
 	end
+
+	local ok, func = pcall_fn(loadstring_fn, content)
+	if not ok then
+		warn("Failed to compile script from " .. tostring(url) .. ": " .. tostring(func))
+		return nil
+	end
+
+	local ok2, result = pcall_fn(func)
+	if not ok2 then
+		warn("Failed to execute script from " .. tostring(url) .. ": " .. tostring(result))
+		return nil
+	end
+
 	return result
 end
 
-loadScript("https://raw.githubusercontent.com/notthecloudy/AirHub-V3/refs/heads/main/src/Library.lua")
+-- Correct raw URLs (use 'main' branch path for raw.githubusercontent)
+local base = "https://raw.githubusercontent.com/notthecloudy/AirHub-V3/main/src/"
+local Library = loadScript(base .. "Library.lua")
+local UI = loadScript(base .. "UI%20Library.lua")     -- space encoded as %20
+local ESP = loadScript(base .. "ESP.lua")
+local Aimbot = loadScript(base .. "Aimbot.lua")
 
-local GUI = loadScript("https://raw.githubusercontent.com/notthecloudy/AirHub-V3/refs/heads/main/src/UI%20Library.lua")
-local ESP = loadScript("https://raw.githubusercontent.com/notthecloudy/AirHub-V3/refs/heads/main/src/ESP.lua")
-local Aimbot = loadScript("https://raw.githubusercontent.com/notthecloudy/AirHub-V3/refs/heads/main/src/Aimbot.lua")
+-- Mark finished
+genv.AirHubV3Loaded = true
+genv.AirHubV3Loading = nil
 
 --// Variables
 
