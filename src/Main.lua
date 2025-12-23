@@ -1,6 +1,6 @@
 --// Loaded Check
 
-if AirHubV3Loaded or AirHubV3Loading or AirHub then
+if AirHubV3Loaded or AirHubV3Loading then
 	return
 end
 
@@ -18,11 +18,30 @@ local osdate = os.date
 
 --// Launching
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/notthecloudy/AirHub-V3/refs/heads/main/src/Library.lua"))()
+local function loadScript(url)
+	local content = game:HttpGet(url)
+	if content == "" then
+		warn("Failed to get script content from " .. url)
+		return nil
+	end
+	local success, func = pcall(loadstring, content)
+	if not success then
+		warn("Failed to load script from " .. url .. ": " .. func)
+		return nil
+	end
+	local success2, result = pcall(func)
+	if not success2 then
+		warn("Failed to execute script from " .. url .. ": " .. result)
+		return nil
+	end
+	return result
+end
 
-local GUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/notthecloudy/AirHub-V3/refs/heads/main/src/UI%20Library.lua"))()
-local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/notthecloudy/AirHub-V3/refs/heads/main/src/ESP.lua"))()
-local Aimbot = loadstring(game:HttpGet("https://raw.githubusercontent.com/notthecloudy/AirHub-V3/refs/heads/main/src/Aimbot.lua"))()
+loadScript("https://raw.githubusercontent.com/notthecloudy/AirHub-V3/refs/heads/main/src/Library.lua")
+
+local GUI = loadScript("https://raw.githubusercontent.com/notthecloudy/AirHub-V3/refs/heads/main/src/UI%20Library.lua")
+local ESP = loadScript("https://raw.githubusercontent.com/notthecloudy/AirHub-V3/refs/heads/main/src/ESP.lua")
+local Aimbot = loadScript("https://raw.githubusercontent.com/notthecloudy/AirHub-V3/refs/heads/main/src/Aimbot.lua")
 
 --// Variables
 
