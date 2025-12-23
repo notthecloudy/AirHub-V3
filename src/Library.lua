@@ -1,9 +1,11 @@
-local cloneref = cloneref or function(...)
-	return ...
+-- Ensure cloneref is defined properly
+local cloneref = function(...)
+    return ...
 end
 
+-- Fix GetService function to use the correct method call syntax
 local GetService = function(Service)
-    return cloneref(game:GetService(Service))  -- Use a colon (:) instead of a dot (.)
+    return cloneref(game:GetService(Service))  -- Correct usage of game:GetService
 end
 
 --// Services
