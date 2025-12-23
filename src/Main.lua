@@ -1,99 +1,35 @@
--- Loaded Check
-local genv = getgenv()
-if genv.AirHubV3Loaded or genv.AirHubV3Loading then
+--[[
+
+	AirHub V2 by Exunys © CC0 1.0 Universal (2023)
+	https://github.com/Exunys
+
+]]
+
+--// Loaded Check
+
+if AirHubV2Loaded or AirHubV2Loading or AirHub then
 	return
 end
-genv.AirHubV3Loading = true
 
---// Cache / locals
-local _game = game
-local loadstring_fn = loadstring or load
-local typeof_fn = typeof
-local pcall_fn = pcall
-local table_find, table_sort = table.find, table.sort
-local math_floor = math.floor
-local string_gsub = string.gsub
-local wait_fn, delay_fn, spawn_fn = task.wait, task.delay, task.spawn
-local os_date = os.date
+getgenv().AirHubV2Loading = true
 
--- Strip BOM from a string if present
-local function strip_bom(s)
-	if typeof_fn(s) == "string" and s:sub(1,3) == "\239\187\191" then
-		return s:sub(4)
-	end
-	return s
-end
+--// Cache
 
--- Safe Http GET wrapper (tries multiple options)
-local function safeHttpGet(url)
-	local ok, res = pcall(function()
-		-- Many exploit environments implement :HttpGet or :HttpGetAsync; fallback to HttpService otherwise
-		if _game.HttpGet then
-			return _game:HttpGet(url)
-		elseif _game.HttpGetAsync then
-			return _game:HttpGetAsync(url)
-		else
-			local hs = game:GetService and game:GetService("HttpService")
-			if hs and hs.GetAsync then
-				return hs:GetAsync(url)
-			end
-		end
-		error("No HttpGet / GetAsync available in this environment")
-	end)
+local game = game
+local loadstring, typeof, select, next, pcall = loadstring, typeof, select, next, pcall
+local tablefind, tablesort = table.find, table.sort
+local mathfloor = math.floor
+local stringgsub = string.gsub
+local wait, delay, spawn = task.wait, task.delay, task.spawn
+local osdate = os.date
 
-	if not ok then
-		warn("HttpGet failed for "..tostring(url)..": "..tostring(res))
-		return nil
-	end
-	return res
-end
+--// Launching
 
--- Load a remote Lua file safely
-local function loadScript(url)
-	local content = safeHttpGet(url)
-	if not content or content == "" then
-		warn("Failed to get script content from " .. tostring(url))
-		return nil
-	end
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Exunys/Roblox-Functions-Library/main/Library.lua"))()
 
-	content = strip_bom(content)
-
-	-- Detect accidental HTML (e.g. fetched a GitHub page instead of raw file)
-	if content:match("<!DOCTYPE") or content:match("<html") then
-		warn("Received HTML instead of raw Lua from " .. tostring(url) .. ". Check the URL (use raw.githubusercontent.com with branch/path).")
-		return nil
-	end
-
-	if not loadstring_fn then
-		warn("No loadstring or load function available in this environment.")
-		return nil
-	end
-
-	local ok, func = pcall_fn(loadstring_fn, content)
-	if not ok then
-		warn("Failed to compile script from " .. tostring(url) .. ": " .. tostring(func))
-		return nil
-	end
-
-	local ok2, result = pcall_fn(func)
-	if not ok2 then
-		warn("Failed to execute script from " .. tostring(url) .. ": " .. tostring(result))
-		return nil
-	end
-
-	return result
-end
-
--- Correct raw URLs (use 'main' branch path for raw.githubusercontent)
-local base = "https://raw.githubusercontent.com/notthecloudy/AirHub-V3/main/src/"
-local Library = loadScript(base .. "Library.lua")
-local UI = loadScript(base .. "UI%20Library.lua")     -- space encoded as %20
-local ESP = loadScript(base .. "ESP.lua")
-local Aimbot = loadScript(base .. "Aimbot.lua")
-
--- Mark finished
-genv.AirHubV3Loaded = true
-genv.AirHubV3Loading = nil
+local GUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Exunys/AirHub-V2/main/src/UI%20Library.lua"))()
+local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/Exunys/Exunys-ESP/main/src/ESP.lua"))()
+local Aimbot = loadstring(game:HttpGet("https://raw.githubusercontent.com/Exunys/Aimbot-V3/main/src/Aimbot.lua"))()
 
 --// Variables
 
@@ -144,33 +80,37 @@ local AddValues = function(Section, Object, Exceptions, Prefix)
 	end
 
 	for Index, Value in next, Copy do
-		if typeof(Value) == "boolean" and not (Exceptions and tablefind(Exceptions, Index)) then
-			Section:Toggle({
-				Name = stringgsub(Index, "(%l)(%u)", function(...)
-					return select(1, ...).." "..select(2, ...)
-				end),
-				Flag = Prefix..Index,
-				Default = Value,
-				Callback = function(_Value)
-					Object[Index] = _Value
-				end
-			})
+		if typeof(Value) ~= "boolean" or (Exceptions and tablefind(Exceptions, Index)) then
+			continue
 		end
+
+		Section:Toggle({
+			Name = stringgsub(Index, "(%l)(%u)", function(...)
+				return select(1, ...).." "..select(2, ...)
+			end),
+			Flag = Prefix..Index,
+			Default = Value,
+			Callback = function(_Value)
+				Object[Index] = _Value
+			end
+		})
 	end
 
 	for Index, Value in next, Copy do
-		if typeof(Value) == "Color3" and not (Exceptions and tablefind(Exceptions, Index)) then
-			Section:Colorpicker({
-				Name = stringgsub(Index, "(%l)(%u)", function(...)
-					return select(1, ...).." "..select(2, ...)
-				end),
-				Flag = Index,
-				Default = Value,
-				Callback = function(_Value)
-					Object[Index] = _Value
-				end
-			})
+		if typeof(Value) ~= "Color3" or (Exceptions and tablefind(Exceptions, Index)) then
+			continue
 		end
+
+		Section:Colorpicker({
+			Name = stringgsub(Index, "(%l)(%u)", function(...)
+				return select(1, ...).." "..select(2, ...)
+			end),
+			Flag = Index,
+			Default = Value,
+			Callback = function(_Value)
+				Object[Index] = _Value
+			end
+		})
 	end
 end
 
@@ -953,7 +893,7 @@ SettingsSection:Button({
 		GUI:Unload()
 		ESP:Exit()
 		Aimbot:Exit()
-		getgenv().AirHubV3Loaded = nil
+		getgenv().AirHubV2Loaded = nil
 	end
 })
 
@@ -992,12 +932,12 @@ ProfilesSection:Button({
 	end
 })
 
-InformationSection:Label("Made by Cloudy")
+InformationSection:Label("Made by Exunys")
 
 InformationSection:Button({
 	Name = "Copy GitHub",
 	Callback = function()
-		setclipboard("https://github.com/Cloudy")
+		setclipboard("https://github.com/Exunys")
 	end
 })
 
@@ -1043,8 +983,8 @@ end)
 
 ESP.Load()
 Aimbot.Load()
-getgenv().AirHubV3Loaded = true
-getgenv().AirHubV3Loading = nil
+getgenv().AirHubV2Loaded = true
+getgenv().AirHubV2Loading = nil
 
 GeneralSignal:Fire()
 GUI:Close()
