@@ -24,6 +24,10 @@ local function loadScript(url)
 		warn("Failed to get script content from " .. url)
 		return nil
 	end
+	-- Remove BOM if present
+	if content:sub(1, 3) == "\xEF\xBB\xBF" then
+		content = content:sub(4)
+	end
 	local success, func = pcall(loadstring, content)
 	if not success then
 		warn("Failed to load script from " .. url .. ": " .. func)
