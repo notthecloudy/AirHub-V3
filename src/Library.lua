@@ -3,7 +3,7 @@ local cloneref = cloneref or function(...)
 end
 
 local GetService = function(Service)
-	return cloneref(game.GetService(game, Service))
+    return cloneref(game:GetService(Service))  -- Use a colon (:) instead of a dot (.)
 end
 
 --// Services
