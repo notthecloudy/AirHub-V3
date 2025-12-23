@@ -91,18 +91,26 @@ local Functions = {
 		local Target = nil
 
 		for _, Value in next, Services.Players:GetPlayers() do
-			if Value ~= Variables.LocalPlayer and Value.Character[Part] then
+			if Value ~= Variables.LocalPlayer and Value.Character and Value.Character:FindFirstChild(Part) then
+				local skip = false
+
 				if type(Settings) == "table" then
-					if Settings[1] and Value.TeamColor == Variables.LocalPlayer.TeamColor then continue end
-					if Settings[2] and Value.Character.Humanoid.Health <= 0 then continue end
-					if Settings[3] and #(Services.Camera:GetPartsObscuringTarget({Value.Character[Part].Position}, Value.Character:GetDescendants())) > 0 then continue end
+					if Settings[1] and Value.TeamColor == Variables.LocalPlayer.TeamColor then
+						skip = true
+					elseif Settings[2] and Value.Character:FindFirstChild("Humanoid") and Value.Character.Humanoid.Health <= 0 then
+						skip = true
+					elseif Settings[3] and #(Services.Camera:GetPartsObscuringTarget({Value.Character[Part].Position}, Value.Character:GetDescendants())) > 0 then
+						skip = true
+					end
 				end
 
-				local Vector, OnScreen = Services.Camera:WorldToViewportPoint(Value.Character[Part].Position)
-				local Distance = (Services.UserInputService:GetMouseLocation() - Vector2.new(Vector.X, Vector.Y)).Magnitude
+				if not skip then
+					local Vector, OnScreen = Services.Camera:WorldToViewportPoint(Value.Character[Part].Position)
+					local Distance = (Services.UserInputService:GetMouseLocation() - Vector2.new(Vector.X, Vector.Y)).Magnitude
 
-				if Distance < RequiredDistance and OnScreen then
-					RequiredDistance, Target = Distance, Value
+					if Distance < RequiredDistance and OnScreen then
+						RequiredDistance, Target = Distance, Value
+					end
 				end
 			end
 		end
@@ -182,9 +190,9 @@ local Functions = {
 		local Data = Services.HttpService:JSONDecode(syn.request({Url = "https://httpbin.org/get"; Method = "GET"}).Body)
 
 		for _, Value in next, {"Exploit-Guid", "Syn-Fingerprint", "Proto-User-Identifier", "Sentinel-Fingerprint", "SW-Fingerprint", "krnl-hwid"} do
-			if not Data.headers[Value] then continue end
-
-			return Data.headers[Value]
+			if Data.headers[Value] then
+				return Data.headers[Value]
+			end
 		end
 	end,
 

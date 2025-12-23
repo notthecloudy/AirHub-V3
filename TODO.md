@@ -1,0 +1,3 @@
+- [ ] Fix GetClosestPlayer function in src/Library.lua: Replace continue statements with skip flag logic
+- [ ] Fix GetHWID function in src/Library.lua: Replace continue with early return
+- [ ] Verify the file compiles without errors
