@@ -23,7 +23,138 @@ local stringgsub = string.gsub
 local wait, delay, spawn = task.wait, task.delay, task.spawn
 local osdate = os.date
 
---// Launching
+--// Library
+
+local cloneref = cloneref or function(...)
+	return ...
+end
+
+local GetService = function(Service)
+	return cloneref(game.GetService(game, Service))
+end
+
+--// Services
+
+local Services = {
+	RunService = GetService("RunService"),
+	UserInputService = GetService("UserInputService"),
+	HttpService = GetService("HttpService"),
+	TweenService = GetService("TweenService"),
+	StarterGui = GetService("StarterGui"),
+	Players = GetService("Players"),
+	StarterPlayer = GetService("StarterPlayer"),
+	Lighting = GetService("Lighting"),
+	ReplicatedStorage = GetService("ReplicatedStorage"),
+	ReplicatedFirst = GetService("ReplicatedFirst"),
+	TeleportService = GetService("TeleportService"),
+	CoreGui = GetService("CoreGui"),
+	--VirtualUser = GetService("VirtualUser"), -- Gets detected by some anti-cheats.
+	Camera = workspace.CurrentCamera
+}
+
+--// Variables
+
+local Variables = {
+	LocalPlayer = Services.Players.LocalPlayer,
+	Typing = false,
+	Mouse = Services.Players.LocalPlayer:GetMouse()
+}
+
+--// Functions
+
+local Functions = {
+	GetService = clonefunction and clonefunction(GetService) or GetService,
+	
+	Encode = function(Table)
+		return Table and type(Table) == "table" and Services.HttpService:JSONEncode(Table)
+	end,
+
+	Decode = function(String)
+		return String and type(String) == "string" and Services.HttpService:JSONDecode(String)
+	end,
+
+	SendNotification = function(TitleArg, DescriptionArg, DurationArg, IconArg)
+		Services.StarterGui:SetCore("SendNotification", {
+			Title = TitleArg,
+			Text = DescriptionArg,
+			Duration = DurationArg,
+			Icon = IconArg
+		})
+	end,
+
+	StringToRGB = function(String)
+		if not String then return end
+		
+		local R = tonumber(string.match(String, "([%d]+)[%s]*,[%s]*[%d]+[%s]*,[%s]*[%d]+"))
+		local G = tonumber(string.match(String, "[%d]+[%s]*,[%s]*([%d]+)[%s]*,[%s]*[%d]+"))
+		local B = tonumber(string.match(String, "[%d]+[%s]*,[%s]*[%d]+[%s]*,[%s]*([%d]+)"))
+
+		return Color3.fromRGB(R, G, B)
+	end,
+
+	RGBToString = function(RGB)
+		return tostring(math.floor(RGB.R * 255))..", "..tostring(math.floor(RGB.G * 255))..", "..tostring(math.floor(RGB.B * 255))
+	end,
+
+	GetClosestPlayer = function(RequiredDistance, Part, Settings)
+		RequiredDistance = RequiredDistance or 1 / 0
+		Part = Part or "HumanoidRootPart"
+		Settings = Settings or {false, false, false}
+
+		local Target = nil
+
+		for _, Value in next, Services.Players:GetPlayers() do
+			if Value ~= Variables.LocalPlayer and Value.Character[Part] then
+				if type(Settings) == "table" then
+					if Settings[1] and Value.TeamColor == Variables.LocalPlayer.TeamColor then continue end
+					if Settings[2] and Value.Character.Humanoid.Health <= 0 then continue end
+					if Settings[3] and #(Services.Camera:GetPartsObscuringTarget({Value.Character[Part].Position}, Value.Character:GetDescendants())) > 0 then continue end
+				end
+
+				local Vector, OnScreen = Services.Camera:WorldToViewportPoint(Value.Character[Part].Position)
+				local Distance = (Services.UserInputService:GetMouseLocation() - Vector2.new(Vector.X, Vector.Y)).Magnitude
+
+				if Distance < RequiredDistance and OnScreen then
+					RequiredDistance, Target = Distance, Value
+				end
+			end
+		end
+
+		return Target
+	end,
+
+	OnScreenCheck = function(Object)
+		return Object.Position and select(2, Services.Camera:WorldToViewportPoint(Object.Position))
+	end,
+
+	Recursive = function(Table, Callback)
+		for Index, Value in next, Table do
+			Callback(Index, Value)
+
+			if type(Value) == "table" then
+				Recursive(Value, Callback)
+			end
+		end
+	end,
+
+	Rejoin = function()
+		Services.TeleportService:Teleport(game.PlaceId, Variables.LocalPlayer)
+	end,
+
+	ServerHop = function(MinPlayers, MaxPing)
+		for _, Value in next, Services.HttpService:JSONDecode(game:HttpGet(string.format("https://games.roblox.com/v1/games/%s/servers/Public?sortOrder=Asc&limit=100", game.PlaceId))) do
+			if Value.playing ~= Value.maxPlayers and Value.playing and Value.playing > MinPlayers or Value.maxPlayers / 2 and Value.ping < MaxPing or 100 then
+				Services.TeleportService:TeleportToPlaceInstance(game.PlaceId, Value.id, Variables.LocalPlayer)
+			else
+				warn("Exunys Developer - ROBLOX Functions & Services Reference Library > Server Hop - Couldn't find a server to hop to! Consider using the \"Rejoin\" option.")
+			end
+		end
+	end,
+
+	SetFOV = function(FOV)
+		Services.Camera.FieldOfView = FOV
+	end
+}
 
 --// Launching (Safe Version)
 
@@ -38,9 +169,6 @@ local function SafeLoad(url, name)
     end
     return result
 end
-
--- Load Library
-SafeLoad("https://raw.githubusercontent.com/notthecloudy/AirHub-V3/refs/heads/main/src/Library.lua", "Library")
 
 -- Load GUI
 local GUI = SafeLoad("https://raw.githubusercontent.com/notthecloudy/AirHub-V3/main/src/UI%20Library.lua", "UI Library")

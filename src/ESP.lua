@@ -15,14 +15,26 @@ end
 --// Custom Drawing Library
 
 if not Drawing or not Drawing.new or not Drawing.Fonts then
-	loadstring(game.HttpGet(game, "https://pastebin.com/raw/huyiRsK0"))()
+	local success, result = pcall(function()
+		loadstring(game.HttpGet(game, "https://pastebin.com/raw/huyiRsK0"))()
+	end)
+	if not success then
+		warn("Failed to load custom Drawing library: " .. tostring(result))
+	end
 
 	repeat
 		wait(0)
 	until Drawing and Drawing.new and type(Drawing.new) == "function" and Drawing.Fonts and type(Drawing.Fonts) == "table"
 end
 
-local ConfigLibrary = loadstring(game.HttpGet(game, "https://raw.githubusercontent.com/Cloudy/Config-Library/main/Main.lua"))()
+local ConfigLibrary
+local success, result = pcall(function()
+    ConfigLibrary = loadstring(game.HttpGet(game, "https://raw.githubusercontent.com/Cloudy/Config-Library/main/Main.lua"))()
+end)
+if not success then
+    warn("Failed to load ConfigLibrary: " .. tostring(result))
+    ConfigLibrary = {} -- Provide a fallback or handle appropriately
+end
 
 local Vector2new, Vector3zero, CFramenew = Vector2.new, Vector3.zero, CFrame.new
 local Drawingnew, DrawingFonts = Drawing.new, Drawing.Fonts
@@ -52,11 +64,16 @@ end, function(self, Index, Value)
 end
 
 if identifyexecutor() == "Solara" then -- Quads are broken on Solara.
-	local DrawQuad = loadstring(game.HttpGet(game, "https://raw.githubusercontent.com/Cloudy/Custom-Quad-Render-Object/main/Main.lua"))() -- Custom Quad Drawing Object
-	local _Drawingnew = clonefunction(Drawing.new)
+	local success, result = pcall(function()
+		local DrawQuad = loadstring(game.HttpGet(game, "https://raw.githubusercontent.com/Cloudy/Custom-Quad-Render-Object/main/Main.lua"))() -- Custom Quad Drawing Object
+		local _Drawingnew = clonefunction(Drawing.new)
 
-	Drawingnew = function(...)
-		return ({...})[1] == "Quad" and DrawQuad(...) or _Drawingnew(...)
+		Drawingnew = function(...)
+			return ({...})[1] == "Quad" and DrawQuad(...) or _Drawingnew(...)
+		end
+	end)
+	if not success then
+		warn("Failed to load custom Quad render object: " .. tostring(result))
 	end
 end
 
